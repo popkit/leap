@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns="http://www.springframework.org/schema/beans"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="org.popkit"/>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+        <property name="detectHandlerMethodsInAncestorContexts" value="true"/>
+    </bean>
+
+    <mvc:annotation-driven>
+        <mvc:argument-resolvers>
+            <bean id="arguementsHandler" class="org.popkit.core.interceptor.ArgumentsHandler"></bean>
+        </mvc:argument-resolvers>
+        <mvc:return-value-handlers>
+            <bean id="returnValHandler" class="org.popkit.core.interceptor.ResponseAdapterHandler"></bean>
+        </mvc:return-value-handlers>
+    </mvc:annotation-driven>
+
+    <mvc:interceptors>
+        <!-- 国际化操作拦截器 如果采用基于（请求/Session/Cookie）则必需配置 -->
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
+        <!-- 如果不定义 mvc:mapping path 将拦截所有的URL请求 -->
+        <bean class="org.popkit.core.interceptor.AuthInterceptor"></bean>
+        <bean class="org.popkit.core.interceptor.ContextHandler"></bean>
+    </mvc:interceptors>
+
+    <!-- use freemarker as view template -->
+    <bean id="freemarkerConfigurer"
+          class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="/WEB-INF/pages/" />
+        <property name="defaultEncoding" value="UTF-8" />
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="template_update_delay">10</prop>
+                <prop key="locale">zh_CN</prop>
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="number_format">#.##</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- use freemarker as view -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
+        <property name="suffix" value=".ftl" />
+        <property name="contentType" value="text/html;charset=UTF-8" />
+        <property name="exposeRequestAttributes" value="true" />
+        <property name="exposeSessionAttributes" value="true" />
+        <property name="exposeSpringMacroHelpers" value="true" />
+    </bean>
+
+    <!-- 上传图片文件 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="5048576" />
+        <property name="defaultEncoding" value="utf-8" />
+    </bean>
+</beans>
