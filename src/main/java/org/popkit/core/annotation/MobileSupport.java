@@ -16,6 +16,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface MobileSupport {
 
-    LeapProtocol[] leapProtocol() default {LeapProtocol.JSON};
+    org.popkit.core.enums.LeapProtocol[] leapProtocol() default {org.popkit.core.enums.LeapProtocol.JSON};
 
 }
