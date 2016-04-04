@@ -7,5 +7,6 @@ package org.popkit.core.enums;
  */
 public enum LeapProtocol {
     JSON,     // json的协议
+    HTML,     // html页面,对m站,模版为freemarker
     ;
 }
