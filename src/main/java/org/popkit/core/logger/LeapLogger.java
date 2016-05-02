@@ -1,6 +1,7 @@
 package org.popkit.core.logger;
 
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Logger;
 
 /**
  * Created by Aborn Jiang
@@ -8,9 +9,18 @@ import org.slf4j.LoggerFactory;
  * 2016-04-28:22:01
  */
 public class LeapLogger {
-    //private static final LeapLogger LOG = LeapLoggerFactory.getLogger("api-sys-monitor");
+
+    private static final Logger LOGGER = Logger.getLogger(LeapLogger.class);
 
     private LeapLogger() {}
+
+    public static void info(String msg) {
+        LOGGER.info(msg);
+    }
+
+    public static void info(String msg, Throwable t) {
+        LOGGER.info(msg, t);
+    }
 
     /**
      * 各类非核心流程 抛Exception 情况
@@ -18,7 +28,7 @@ public class LeapLogger {
      * @param t
      */
     public static void warn(LogMsg msg, Throwable t) {
-        //LOG.warn(msg.toString(), t);
+        LOGGER.warn(msg.toString(), t);
     }
 
     /**
@@ -27,6 +37,22 @@ public class LeapLogger {
      * @param t
      */
     public static void warn(String msg, Throwable t) {
-        //LOG.warn(msg, t);
+        LOGGER.warn(msg, t);
+    }
+
+    public static void debug(String msg) {
+        LOGGER.debug(msg);
+    }
+
+    public static void debug(String msg, Throwable t) {
+        LOGGER.debug(msg, t);
+    }
+
+    public static void error(String msg) {
+        LOGGER.error(msg);
+    }
+
+    public static void error(String msg, Throwable t) {
+        LOGGER.error(msg, t);
     }
 }
