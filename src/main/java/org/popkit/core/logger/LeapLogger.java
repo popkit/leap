@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
  */
 public class LeapLogger {
 
-    private static final Logger LOGGER = Logger.getLogger(LeapLogger.class);
+    private static final Logger LOGGER = Logger.getLogger("leap-biz-log");
 
     private LeapLogger() {}
 
