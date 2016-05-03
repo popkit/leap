@@ -40,6 +40,10 @@ public class LeapLogger {
         LOGGER.warn(msg, t);
     }
 
+    public static void warn(String msg) {
+        LOGGER.warn(msg);
+    }
+
     public static void debug(String msg) {
         LOGGER.debug(msg);
     }
