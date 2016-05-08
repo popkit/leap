@@ -1,8 +1,10 @@
 package org.popkit.core.beans;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.popkit.core.annotation.MobileRequest;
 import org.popkit.core.context.LeapContext;
+import org.popkit.core.logger.LeapLogger;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -64,7 +66,7 @@ public class DefaultRequestBuilder {
                     }
 
                     // 获取参数的value值
-                    String value = context.getParameter(name);
+                    String value = context.getParameter(name.toLowerCase());
                     if (decoded) {
                         value = getDecodedValue(value);
                     }
@@ -75,9 +77,15 @@ public class DefaultRequestBuilder {
                     if (value != null) {
                         try {
                             field.setAccessible(true);
-                            ReflectionUtils.setField(field, model, value);
+                            if (field.getType().getName().equals("java.lang.Integer")) {
+                                Object realValue = Integer.parseInt(value);
+                                ReflectionUtils.setField(field, model, realValue);
+                            } else {
+                                ReflectionUtils.setField(field, model, value);
+                            }
+
                         } catch (Throwable t) {
-                            // log here
+                            LeapLogger.warn("error in setting field", t);
                         }
                     }
                 }
@@ -85,8 +93,12 @@ public class DefaultRequestBuilder {
             }
             return (T) model;
         } catch (BeanInstantiationException e) {
+            LeapLogger.warn("error in BeanInstantiationException", e);
             // throw exception
+        } catch (Exception e) {
+            LeapLogger.warn("error in instantiate", e);
         }
         return null;
     }
+
 }
