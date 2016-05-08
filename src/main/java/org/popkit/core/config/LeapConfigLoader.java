@@ -1,5 +1,6 @@
 package org.popkit.core.config;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.popkit.core.logger.LeapLogger;
@@ -9,7 +10,9 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Aborn Jiang
@@ -26,7 +29,7 @@ public class LeapConfigLoader {
 
     @PostConstruct
     private void init() {
-        initConfigMap();
+        updateConfigMap();
     }
 
     public static String getWebappsRoot() {
@@ -36,31 +39,36 @@ public class LeapConfigLoader {
     }
 
     public static String get(String key) {
+        updateConfigMap();
         return config.get(key);
     }
 
-    private static void initConfigMap() {
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
-            String sCurrentLine;
-            while ((sCurrentLine = br.readLine()) != null) {
-                if (StringUtils.isNotBlank(sCurrentLine) && (!sCurrentLine.trim().startsWith("#"))) {
-                    String[] keyValuePair = sCurrentLine.split("=");
-                    if (keyValuePair.length > 1) {
-                        config.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+    private static void updateConfigMap() {
+        new Thread(new Runnable() {
+            public void run() {
+                BufferedReader br = null;
+                try {
+                    br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
+                    String sCurrentLine;
+                    while ((sCurrentLine = br.readLine()) != null) {
+                        if (StringUtils.isNotBlank(sCurrentLine) && (!sCurrentLine.trim().startsWith("#"))) {
+                            String[] keyValuePair = sCurrentLine.split("=");
+                            if (keyValuePair.length > 1) {
+                                config.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    LeapLogger.error("error", e);
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (br != null)br.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
                 }
             }
-        } catch (IOException e) {
-            LeapLogger.error("error", e);
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null)br.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
+        }).start();
     }
 }
