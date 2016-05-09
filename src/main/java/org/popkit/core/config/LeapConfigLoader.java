@@ -1,6 +1,5 @@
 package org.popkit.core.config;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.popkit.core.logger.LeapLogger;
@@ -10,9 +9,7 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Aborn Jiang
@@ -70,5 +67,10 @@ public class LeapConfigLoader {
                 }
             }
         }).start();
+    }
+
+    public static void main(String[] args) {
+        String imageRoot = get("anno_root");
+        System.out.println("imageRoot=" + imageRoot);
     }
 }
