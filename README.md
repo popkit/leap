@@ -1,2 +1,2 @@
 # leap
-java spring mapi
+java web mapi based on spring.
