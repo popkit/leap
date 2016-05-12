@@ -1,6 +1,6 @@
 package org.popkit.core.interceptor;
 
-import org.popkit.core.annotation.MobileRequest;
+import org.popkit.core.annotation.LeapRequest;
 import org.popkit.core.beans.DefaultRequestBuilder;
 import org.popkit.core.context.FrameworkContext;
 import org.popkit.core.context.LeapContext;
@@ -56,6 +56,6 @@ public class ArgumentsHandler implements HandlerMethodArgumentResolver {
             return true;
         }
 
-        return null != clazz.getAnnotation(MobileRequest.class);
+        return null != clazz.getAnnotation(LeapRequest.class);
     }
 }

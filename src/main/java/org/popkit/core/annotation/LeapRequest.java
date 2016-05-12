@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface MobileRequest {
+public @interface LeapRequest {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)

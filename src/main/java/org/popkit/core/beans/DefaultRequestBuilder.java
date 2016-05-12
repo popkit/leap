@@ -1,8 +1,7 @@
 package org.popkit.core.beans;
 
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.popkit.core.annotation.MobileRequest;
+import org.popkit.core.annotation.LeapRequest;
 import org.popkit.core.context.LeapContext;
 import org.popkit.core.logger.LeapLogger;
 import org.springframework.beans.BeanInstantiationException;
@@ -55,7 +54,7 @@ public class DefaultRequestBuilder {
                     emptyCheck = false;
                     decoded = true;
                     Field field = fields[i];
-                    MobileRequest.Param param = field.getAnnotation(MobileRequest.Param.class);
+                    LeapRequest.Param param = field.getAnnotation(LeapRequest.Param.class);
                     String name;
                     if (param != null) {
                         name = param.name();

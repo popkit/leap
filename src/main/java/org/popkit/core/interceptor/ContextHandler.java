@@ -1,6 +1,6 @@
 package org.popkit.core.interceptor;
 
-import org.popkit.core.annotation.MobileSupport;
+import org.popkit.core.annotation.LeapSupport;
 import org.popkit.core.context.FrameworkContext;
 import org.popkit.core.context.ClientRequest;
 import org.popkit.core.context.impl.DefaultLeapContext;
@@ -26,8 +26,8 @@ public class ContextHandler extends HandlerInterceptorAdapter {
         try {
             if (handler instanceof HandlerMethod) {
                 HandlerMethod handlerMethod = (HandlerMethod) handler;
-                MobileSupport support = handlerMethod.getMethod().getAnnotation(MobileSupport.class);
-                MobileSupport mobileSupportOnClazz = handlerMethod.getBeanType().getAnnotation(MobileSupport.class);
+                LeapSupport support = handlerMethod.getMethod().getAnnotation(LeapSupport.class);
+                LeapSupport leapSupportOnClazz = handlerMethod.getBeanType().getAnnotation(LeapSupport.class);
 
                 // 无论怎样都要有frameworkcontext
                 FrameworkContext frameworkContext = new FrameworkContext();
@@ -36,7 +36,7 @@ public class ContextHandler extends HandlerInterceptorAdapter {
                 frameworkContext.setAction(handlerMethod.getMethod());
                 FrameworkContextUtils.setFrameworkContextThreadLocal(frameworkContext);
 
-                if (null != support || null != mobileSupportOnClazz) {
+                if (null != support || null != leapSupportOnClazz) {
                     DefaultLeapContext leapContext = new DefaultLeapContext(request);
 
                     // 将参数存入map
