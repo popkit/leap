@@ -57,7 +57,7 @@ public class DefaultRequestBuilder {
                     LeapRequest.Param param = field.getAnnotation(LeapRequest.Param.class);
                     String name;
                     if (param != null) {
-                        name = param.name();
+                        name = StringUtils.isBlank(param.name()) ? field.getName() : param.name();
                         emptyCheck = param.required();
                         decoded = param.decoded();
                     } else {
@@ -76,8 +76,11 @@ public class DefaultRequestBuilder {
                     if (value != null) {
                         try {
                             field.setAccessible(true);
-                            if (field.getType().getName().equals("java.lang.Integer")) {
+                            if (field.getType() == Integer.class) {
                                 Object realValue = Integer.parseInt(value);
+                                ReflectionUtils.setField(field, model, realValue);
+                            } else if (field.getType() == Double.class) {
+                                Object realValue = Double.parseDouble(value);
                                 ReflectionUtils.setField(field, model, realValue);
                             } else {
                                 ReflectionUtils.setField(field, model, value);
