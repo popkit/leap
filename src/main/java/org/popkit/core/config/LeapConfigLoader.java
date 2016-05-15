@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Aborn Jiang
@@ -21,6 +23,8 @@ public class LeapConfigLoader {
     private static final String CONFIG_FILE_UNIX = "/data/webapps/";
     private static final String CONFIG_FILE_WINDOWS = "D:/data/webapps/";
     private static final String APPKIT_CONFIG_FILE_NAME = "leap.conf";
+    private static final ExecutorService exector = Executors.newFixedThreadPool(1);
+    private static volatile boolean isWorking = false;
 
     private static final ConcurrentHashMap<String, String> config = new ConcurrentHashMap<String, String>();
 
@@ -40,9 +44,14 @@ public class LeapConfigLoader {
         return config.get(key);
     }
 
-    private static void updateConfigMap() {
-        new Thread(new Runnable() {
+    private static synchronized void updateConfigMap() {
+        if (isWorking) {   // 已经在更新中,直接返回
+            return;
+        }
+
+        exector.submit(new Runnable() {
             public void run() {
+                isWorking = true;
                 BufferedReader br = null;
                 try {
                     br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
@@ -65,8 +74,9 @@ public class LeapConfigLoader {
                         ex.printStackTrace();
                     }
                 }
+                isWorking = false;   // 本次更新完成
             }
-        }).start();
+        });
     }
 
     public static void main(String[] args) {
