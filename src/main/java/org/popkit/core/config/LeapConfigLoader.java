@@ -40,17 +40,19 @@ public class LeapConfigLoader {
     }
 
     public static String get(String key) {
-        updateConfigMap();
+        if (!config.containsKey(key)) {
+            updateConfigMap();
+        }
         return config.get(key);
     }
 
     private static synchronized void updateConfigMap() {
-        if (isWorking) {   // 已经在更新中,直接返回
-            return;
-        }
+        //if (isWorking) {   // 已经在更新中,直接返回
+        //    return;
+        //}
 
-        exector.submit(new Runnable() {
-            public void run() {
+        //exector.submit(new Runnable() {
+        //    public void run() {
                 isWorking = true;
                 BufferedReader br = null;
                 try {
@@ -76,8 +78,8 @@ public class LeapConfigLoader {
                 }
                 isWorking = false;   // 本次更新完成
             }
-        });
-    }
+        //});
+    //}
 
     public static void main(String[] args) {
         String imageRoot = get("anno_root");
