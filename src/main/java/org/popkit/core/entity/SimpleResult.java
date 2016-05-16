@@ -24,6 +24,14 @@ public class SimpleResult {
         this.info = info;
     }
 
+    public static SimpleResult fail(String info) {
+        return new SimpleResult(false, info);
+    }
+
+    public static SimpleResult success(String info) {
+        return new SimpleResult(true, info);
+    }
+    
     public boolean isSuccess() {
         return success;
     }
