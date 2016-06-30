@@ -9,9 +9,11 @@ import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Aborn Jiang
@@ -20,11 +22,13 @@ import java.util.concurrent.Executors;
  */
 @Service
 public class LeapConfigLoader {
+    private static final int TIME_OUT = 1000*60;   // 1-minuts
     private static final String CONFIG_FILE_UNIX = "/data/webapps/";
     private static final String CONFIG_FILE_WINDOWS = "D:/data/webapps/";
     private static final String APPKIT_CONFIG_FILE_NAME = "leap.conf";
     private static final ExecutorService exector = Executors.newFixedThreadPool(1);
-    private static volatile boolean isWorking = false;
+    private static AtomicBoolean STATUS = new AtomicBoolean(false);
+    private static Date LAST_UPDATE_TIME = null;
 
     private static final ConcurrentHashMap<String, String> config = new ConcurrentHashMap<String, String>();
 
@@ -40,46 +44,48 @@ public class LeapConfigLoader {
     }
 
     public static String get(String key) {
-        if (!config.containsKey(key)) {
-            updateConfigMap();
-        }
+        updateConfigMap();
         return config.get(key);
     }
 
-    private static synchronized void updateConfigMap() {
-        //if (isWorking) {   // 已经在更新中,直接返回
-        //    return;
-        //}
+    private static void updateConfigMap() {
+        if (LAST_UPDATE_TIME == null ||
+                (new Date().getTime() - LAST_UPDATE_TIME.getTime() > TIME_OUT)) {
 
-        //exector.submit(new Runnable() {
-        //    public void run() {
-                isWorking = true;
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
-                    String sCurrentLine;
-                    while ((sCurrentLine = br.readLine()) != null) {
-                        if (StringUtils.isNotBlank(sCurrentLine) && (!sCurrentLine.trim().startsWith("#"))) {
-                            String[] keyValuePair = sCurrentLine.split("=");
-                            if (keyValuePair.length > 1) {
-                                config.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+            if (!STATUS.compareAndSet(false, true)) {
+                return;
+            }
+
+            exector.submit(new Runnable() {
+                public void run() {
+                    BufferedReader br = null;
+                    try {
+                        br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
+                        String sCurrentLine;
+                        while ((sCurrentLine = br.readLine()) != null) {
+                            if (StringUtils.isNotBlank(sCurrentLine) && (!sCurrentLine.trim().startsWith("#"))) {
+                                String[] keyValuePair = sCurrentLine.split("=");
+                                if (keyValuePair.length > 1) {
+                                    config.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+                                }
                             }
                         }
-                    }
-                } catch (IOException e) {
-                    LeapLogger.error("error", e);
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (br != null)br.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    } catch (IOException e) {
+                        LeapLogger.error("error", e);
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (br != null) br.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        LAST_UPDATE_TIME = new Date();
+                        STATUS.compareAndSet(true, false);
                     }
                 }
-                isWorking = false;   // 本次更新完成
-            }
-        //});
-    //}
+            });
+        }
+    }
 
     public static void main(String[] args) {
         String imageRoot = get("anno_root");
