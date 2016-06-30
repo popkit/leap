@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
  * Mail aborn.jiang@gmail.com
  * 2016-04-28:22:01
  */
-public class LeapLogger {
+public final class LeapLogger {
 
     private static final Logger LOGGER = Logger.getLogger("leap-biz-log");
 
