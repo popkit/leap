@@ -71,7 +71,7 @@ public class LeapConfigLoader {
                             }
                         }
                     } catch (IOException e) {
-                        LeapLogger.error("error", e);
+                        LeapLogger.error("error in updateConfigMap()", e);
                         e.printStackTrace();
                     } finally {
                         try {
