@@ -44,6 +44,21 @@ public class LeapConfigLoader {
     }
 
     public static String get(String key) {
+        if (config.containsKey(key)) {
+            updateConfig(true);
+        } else {
+            updateConfig(false);
+        }
+
+        return config.get(key);
+    }
+
+    public static void updateConfig(boolean isAsync) {
+        if (!isAsync) {
+            sync();
+            return;
+        }
+
         if (new Date().getTime() - LAST_UPDATE_TIME.getTime() > TIME_OUT) {
             SYNC_EXECUTOR_SERVICE.execute(new Runnable() {
                 public void run() {
@@ -51,10 +66,7 @@ public class LeapConfigLoader {
                 }
             });
         }
-
-        return config.get(key);
     }
-
     private static void sync() {
         // Thread safety
         if (!STATUS.compareAndSet(false, true)) {
