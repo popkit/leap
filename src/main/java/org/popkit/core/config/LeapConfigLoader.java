@@ -51,7 +51,7 @@ public class LeapConfigLoader {
                 }
             });
         }
-        
+
         return config.get(key);
     }
 
