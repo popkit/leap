@@ -44,8 +44,22 @@ public class LeapConfigLoader {
     }
 
     public static String get(String key) {
-        updateConfigMap();
-        return config.get(key);
+        return get(key, false);
+    }
+
+    public static String get(String key, boolean isSyncUpdate) {
+        String value = config.get(key);
+        if (value == null && isSyncUpdate) {
+            try {
+                doUpdateAction();
+                value = config.get(key);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            updateConfigMap();
+        }
+        return value;
     }
 
     private static void updateConfigMap() {
@@ -58,32 +72,30 @@ public class LeapConfigLoader {
 
             exector.submit(new Runnable() {
                 public void run() {
-                    BufferedReader br = null;
                     try {
-                        br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
-                        String sCurrentLine;
-                        while ((sCurrentLine = br.readLine()) != null) {
-                            if (StringUtils.isNotBlank(sCurrentLine) && (!sCurrentLine.trim().startsWith("#"))) {
-                                String[] keyValuePair = sCurrentLine.split("=");
-                                if (keyValuePair.length > 1) {
-                                    config.put(keyValuePair[0].trim(), keyValuePair[1].trim());
-                                }
-                            }
-                        }
+                        doUpdateAction();
                     } catch (IOException e) {
                         LeapLogger.error("error", e);
                         e.printStackTrace();
                     } finally {
-                        try {
-                            if (br != null) br.close();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
                         LAST_UPDATE_TIME = new Date();
                         STATUS.compareAndSet(true, false);
                     }
                 }
             });
+        }
+    }
+
+    public static void doUpdateAction() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(getWebappsRoot() + APPKIT_CONFIG_FILE_NAME));
+        String sCurrentLine;
+        while ((sCurrentLine = br.readLine()) != null) {
+            if (StringUtils.isNotBlank(sCurrentLine) && (!sCurrentLine.trim().startsWith("#"))) {
+                String[] keyValuePair = sCurrentLine.split("=");
+                if (keyValuePair.length > 1) {
+                    config.put(keyValuePair[0].trim(), keyValuePair[1].trim());
+                }
+            }
         }
     }
 
