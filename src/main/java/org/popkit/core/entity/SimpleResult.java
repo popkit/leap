@@ -5,9 +5,10 @@ package org.popkit.core.entity;
  * Mail aborn.jiang@gmail.com
  * 2016-05-16:11:47
  */
-public class SimpleResult {
+public class SimpleResult<T> {
     private boolean success;
     private String info;
+    private T data;
 
     public SimpleResult() {
         this.success = false;
@@ -46,5 +47,13 @@ public class SimpleResult {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 }
